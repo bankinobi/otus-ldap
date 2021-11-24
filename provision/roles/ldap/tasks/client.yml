@@ -1,0 +1,45 @@
+---
+- name: Set FQDN hostname
+  hostname: 
+    name: '{{ ipa_client_fqdn }}'
+
+- name: Install ipa packages
+  yum: 
+   name: 
+    - ipa-client
+    - freeipa-admintools
+    - bind-utils
+   state: present
+
+- name: Install ipa client
+  command: 
+    cmd: |
+      ipa-client-install -U
+      --realm {{ ipa_realm }}
+      --domain {{ ipa_domain }} 
+      --server={{ ipa_server_fqdn }} 
+      --ip-address={{ ipa_server_ip }} 
+      --hostname={{ ipa_client_fqdn }} 
+      --mkhomedir
+      --force-ntpd
+      -p admin 
+      -w ipa123123 
+    creates: /etc/ipa/default.conf
+
+- name: Create otus user .ssh dir
+  file: 
+   path: /home/otus/.ssh
+   owner: otus
+   group: otus
+   state: directory
+   mode: "0700"
+  become: true
+  become_user: otus
+
+- name: Copy otus private key
+  copy:
+   src: files/id_rsa
+   dest: /home/otus/.ssh/id_rsa
+   owner: otus
+   group: otus
+   mode: "0600"

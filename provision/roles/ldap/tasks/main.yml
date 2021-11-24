@@ -1,0 +1,29 @@
+---
+- name: Install packages
+  yum:
+    name:
+      - vim
+      - epel-release
+    state: latest
+
+- name: Add FQDN entries to /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ item }}"
+  loop:
+    - '{{ ipa_server_ip }} {{ ipa_server_fqdn }} {{ ipa_server_fqdn }}'
+    - '{{ ipa_client_ip }} {{ ipa_client_fqdn }} {{ ipa_client_fqdn }}'
+
+- name: Start and enable firewalld
+  service:
+    name: firewalld
+    state: restarted
+    enabled: true
+
+- name: Include server tasks
+  include_tasks: server.yml
+  when: '"server" in inventory_hostname'
+
+- name: Include client tasks
+  include_tasks: client.yml
+  when: '"client" in inventory_hostname'

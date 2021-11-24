@@ -1,0 +1,67 @@
+---
+- name: Set FQDN hostname
+  hostname: 
+    name: '{{ ipa_server_fqdn }}'
+
+- name: Install ipa packages
+  yum: 
+   name:
+    - nss
+    - ipa-server
+    - ipa-server-dns
+    - bind-dyndb-ldap
+   state: latest
+
+- name: Install ipa server
+  command: 
+    cmd: |
+      ipa-server-install -U
+      --realm {{ ipa_realm }}
+      --domain {{ ipa_domain }}
+      --hostname={{ ipa_server_fqdn }}
+      --ip-address={{ ipa_server_ip }}
+      --setup-dns
+      --auto-forwarders
+      --no-reverse
+      --mkhomedir
+      -a ipa123123
+      -p ipa123123
+    creates: /etc/ipa/default.conf
+
+- name: Kinit as admin
+  shell: echo "ipa123123" | kinit admin
+
+- name: Add ipa sudorule 
+  shell: ipa sudorule-add --cmdcat=all OTUS
+
+- name: Grant admins group with OTUS sudorule
+  shell: ipa sudorule-add-user --groups=admins OTUS
+
+- name: Create new ipa user
+  shell: echo "ipa123123" | ipa user-add otus --first=Otus --last=Otusov --email=ootusov@otus.ru --shell=/bin/bash --sshpubkey="{{ ipa_user_pub_key }}" --password
+
+- name: Add otus user to admins group
+  shell: ipa group-add-member admins --users=otus
+
+- name: Create otus user .ssh dir
+  file: 
+   path: /home/otus/.ssh
+   owner: otus
+   group: otus
+   state: directory
+   mode: "0700"
+  become: true
+  become_user: otus
+
+- name: Copy otus private key
+  copy:
+   src: files/id_rsa
+   dest: /home/otus/.ssh/id_rsa
+   owner: otus
+   group: otus
+   mode: "0600"
+
+- name: Add firewalld ipa service
+  shell: |
+    firewall-cmd --add-service=freeipa-ldap --add-service=freeipa-ldaps &&
+    firewall-cmd --add-service=freeipa-ldap --add-service=freeipa-ldaps --permanent

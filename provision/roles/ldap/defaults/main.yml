@@ -1,0 +1,7 @@
+ipa_server_fqdn: server.ipa.test
+ipa_client_fqdn: client.ipa.test
+ipa_server_ip: 192.168.50.20
+ipa_client_ip: 192.168.50.21
+ipa_realm: IPA.TEST
+ipa_domain: ipa.test
+ipa_user_pub_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDHnjhQ+M7O80/uh29sVAyHTp/ldL1WikH/tdlpQylYmYtFXOOps4zbY0WWxqBajg96mEAPLOjcV5cG8lHNjNNS2+N7oZMMJKOa9vsDrscXW8DvMiRykJi38RQm63Kxhw87SsqewqSj3VqOFIOEsf6NAYQUoe/eBdGNuhZowBbagzANOO74c1VxPUGFevsYNjh/cZNhjMRoZPO+bwIIJWAzBRIhpAZKUrkrWmKtnN4nNHU0SXKpjifJPBf/ofwWFKJRTii7o7ZIaIPADcbbjg/s1maISmXXs5Suti0DdchRMfPP2yi1q/LdHqFnHkGzCkep8TqypM3yBTB7KObdLQtt otus@client.ipa.test
